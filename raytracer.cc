@@ -94,13 +94,14 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
     HitResult hit;
 
     // First, sort the world objects
-    std::sort(world.begin(), world.end());
+    std::sort(world.begin(), world.end()); // RE: Maybe have ssorting at start once?
 
     // then add all objects into a remaining objects set of unique objects, so that we don't trace against the same object twice
     std::vector<Object*> uniqueObjects;
     for (size_t i = 0; i < world.size(); ++i)
     {
         Object* obj = world[i];
+        // RE: WTH is this shit?
         std::vector<Object*>::iterator it = std::find_if(uniqueObjects.begin(), uniqueObjects.end(), 
                 [obj](const auto& val)
                 {

@@ -163,6 +163,7 @@ int main()
     framebufferCopy.resize(w * h);
 
     // rendering loop
+    /*
     while (wnd.IsOpen() && !exit)
     {
         resetFramebuffer = false;
@@ -218,6 +219,10 @@ int main()
         wnd.Blit((float*)&framebufferCopy[0], w, h);
         wnd.SwapBuffers();
     }
+    */
+
+    // Run raytrace
+    rt.Raytrace();
 
     if (wnd.IsOpen())
         wnd.Close();

@@ -6,6 +6,7 @@
 #include "ray.h"
 #include "object.h"
 #include <float.h>
+#include <chrono>
 
 //------------------------------------------------------------------------------
 /**

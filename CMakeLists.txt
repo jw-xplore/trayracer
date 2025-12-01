@@ -2,7 +2,7 @@
 # trayracer
 #--------------------------------------------------------------------------
 PROJECT(trayracer)
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
 if(MSVC)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
