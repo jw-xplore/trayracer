@@ -8,6 +8,9 @@
 
 class vec3
 {
+private:
+    inline double len(vec3 const& v);
+
 public:
     vec3() : x(0), y(0), z(0)
     {
@@ -50,30 +53,18 @@ public:
 
     double x, y, z;
 
-    bool IsNormalized()
+    inline bool IsNormalized()
     {
-        // RE: Hack for removing IsNormalized check from the constructors
-        this->UpdateIsNormalizedVariable();
-
-        return this->isNormalized;
+        return len(*this) == 1.0;
     }
 
-    bool IsZero()
+    inline bool IsZero()
     {
-        // RE: Zero check hack
-        this->UpdateIsZeroVariable();
-
-        return this->isZero;
+        return this->x == 0 && this->y == 0 && this->z == 0;
     }
 
 private:
-    // Calculate if the vector is normalized
-    void UpdateIsNormalizedVariable();
-    // Calculate if the vector is zero
-    void UpdateIsZeroVariable();
 
-    volatile bool isNormalized;
-    volatile bool isZero;
 };
 
 // Get length of 3D vector
@@ -95,28 +86,6 @@ inline vec3 normalize(vec3 v)
 
     vec3 ret = vec3(v.x / l, v.y / l, v.z / l);
     return vec3(ret);
-}
-
-inline void vec3::UpdateIsNormalizedVariable()
-{
-    if (len(*this) == 1.0)
-    {
-        this->isNormalized = true;
-        return;
-    }
-    
-    this->isNormalized = false;
-}
-
-inline void vec3::UpdateIsZeroVariable()
-{
-    if (len(*this) == 0.0)
-    {
-        this->isZero = true;
-        return;
-    }
-    
-    this->isZero = false;
 }
 
 // piecewise multiplication between two vectors

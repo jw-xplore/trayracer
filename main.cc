@@ -200,6 +200,7 @@ int main()
             frameIndex = 0;
         }
 
+        // RE: Make raytrace run on other thread
         rt.Raytrace();
         frameIndex++;
 
