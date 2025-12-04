@@ -3,6 +3,8 @@
 #include "vec3.h"
 #include "raytracer.h"
 #include "sphere.h"
+#include <chrono>
+#include <iostream>
 
 #define degtorad(angle) angle * MPI / 180
 
@@ -163,9 +165,10 @@ int main()
     framebufferCopy.resize(w * h);
 
     // rendering loop
-    /*
     while (wnd.IsOpen() && !exit)
     {
+        break;
+
         resetFramebuffer = false;
         moveDir = {0,0,0};
         pitch = 0;
@@ -219,10 +222,18 @@ int main()
         wnd.Blit((float*)&framebufferCopy[0], w, h);
         wnd.SwapBuffers();
     }
-    */
 
     // Run raytrace
+    auto start = std::chrono::high_resolution_clock::now();
     rt.Raytrace();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> ms_double = end - start;
+
+    double t = ms_double.count();
+
+    std::cout << "Time: " << t << "ms" << std::endl;
+
+    // RE: Note original measured time: 27.0967ms
 
     if (wnd.IsOpen())
         wnd.Close();

@@ -24,6 +24,15 @@ Raytracer::Raytrace()
     std::mt19937 generator (leet++);
     std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
+    // RE: Looks like caching doesn't really save performance?
+    float u = 0;
+    float v = 0;
+    vec3 direction;
+    Ray* ray = new Ray(get_position(this->view), direction);
+
+    float wFactor = (1.0f / this->width);
+    float hFactor = (1.0f / this->height);
+
     for (int x = 0; x < this->width; ++x)
     {
         for (int y = 0; y < this->height; ++y)
@@ -31,15 +40,19 @@ Raytracer::Raytrace()
             Color color;
             for (int i = 0; i < this->rpp; ++i)
             {
-                float u = ((float(x + dis(generator)) * (1.0f / this->width)) * 2.0f) - 1.0f;
-                float v = ((float(y + dis(generator)) * (1.0f / this->height)) * 2.0f) - 1.0f;
+                // RE: u and v setting takes around 18 instruction each
+                float disres = dis(generator);
+                u = ((float(x + disres) * wFactor) * 2.0f) - 1.0f;
+                v = ((float(y + disres) * hFactor) * 2.0f) - 1.0f;
 
-                vec3 direction = vec3(u, v, -1.0f);
+                // RE: direction and ray also takes a many instruction to setup, consider caching?
+                direction = vec3(u, v, -1.0f);
                 direction = transform(direction, this->frustum);
                 
-                Ray* ray = new Ray(get_position(this->view), direction);
+                // RENOTE: Don't recreate the ray, only update magnitude
+                //ray = new Ray(get_position(this->view), direction);
+                ray->m = direction;
                 color += this->TracePath(*ray, 0);
-                delete ray;
             }
 
             // divide by number of samples per pixel, to get the average of the distribution
@@ -50,6 +63,8 @@ Raytracer::Raytrace()
             this->frameBuffer[y * this->width + x] += color;
         }
     }
+
+    delete ray;
 }
 
 //------------------------------------------------------------------------------
@@ -64,8 +79,10 @@ Raytracer::TracePath(Ray ray, unsigned n)
     Object* hitObject = nullptr;
     float distance = FLT_MAX;
 
-    if (Raycast(ray, hitPoint, hitNormal, hitObject, distance, this->objects))
+    // RE: This compare is also quite heavy, to be checked
+    if (Raycast(ray, hitPoint, hitNormal, hitObject, distance))
     {
+        // RE: ray creation take a lot of instruction + deleting it just add lot of load for each iteration
         Ray* scatteredRay = new Ray(hitObject->ScatterRay(ray, hitPoint, hitNormal));
         if (n < this->bounces)
         {
@@ -86,40 +103,54 @@ Raytracer::TracePath(Ray ray, unsigned n)
 /**
 */
 bool
-Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance, std::vector<Object*> world)
+Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
 {
     bool isHit = false;
     HitResult closestHit;
     int numHits = 0;
     HitResult hit;
 
+    // RENOTE: Seems like there is no real deference between world and unique objects
+
     // First, sort the world objects
-    std::sort(world.begin(), world.end()); // RE: Maybe have ssorting at start once?
+    //std::sort(world.begin(), world.end()); // RE: Maybe have sorting at start once? It seems pointless maybe?
 
     // then add all objects into a remaining objects set of unique objects, so that we don't trace against the same object twice
+    // RE: Objects should be unique from start
+    /*
     std::vector<Object*> uniqueObjects;
     for (size_t i = 0; i < world.size(); ++i)
     {
         Object* obj = world[i];
-        // RE: WTH is this shit?
-        std::vector<Object*>::iterator it = std::find_if(uniqueObjects.begin(), uniqueObjects.end(), 
-                [obj](const auto& val)
-                {
-                    return (obj->GetName() == val->GetName() && obj->GetId() == val->GetId());
-                }
-            );
 
-        if (it == uniqueObjects.end())
+        // RE: This simple looping is much faster than iterator with lambda 
+        int objSize = uniqueObjects.size();
+        bool found = false;
+        for (int oi = 0; i < objSize; i++)
         {
+            if (obj->GetName() == uniqueObjects[i]->GetName() && obj->GetId() == uniqueObjects[i]->GetId())
+            {
+                bool found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            // RE: Pushing gives loot of load, only option is to have unique items from the start
             uniqueObjects.push_back(obj);
         }
     }
+    */
 
-    while (uniqueObjects.size() > 0)
+    int objSize = this->objects.size();
+
+    for (int i = 0; i < objSize; i++)
     {
-        auto objectIt = uniqueObjects.begin();
-        Object* object = *objectIt;
+        // RE: Is auto taking more than strong typing?
+        Object* object = this->objects[i];
 
+        // RE: Type casting could be an issue?
         auto opt = object->Intersect(ray, closestHit.t);
         if (opt.HasValue())
         {
@@ -130,8 +161,11 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
             isHit = true;
             numHits++;
         }
-        uniqueObjects.erase(objectIt);
     }
+
+    // RENOTE: Clear improves speed as there is no erase and resize for each iteration
+    // Clear once can't be used for proper rendering
+    //world.clear();
 
     hitPoint = closestHit.p;
     hitNormal = closestHit.normal;

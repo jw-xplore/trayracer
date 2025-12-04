@@ -2,6 +2,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <assert.h>
+#include <immintrin.h>
 
 #define MPI 3.14159265358979323846
 
@@ -10,14 +11,11 @@ class vec3
 public:
     vec3() : x(0), y(0), z(0)
     {
-        this->UpdateIsNormalizedVariable();
-        this->UpdateIsZeroVariable();
+        // RE: Maybe storing normalized is not good as every calculation requires normalized check?
     }
 
     vec3(double x, double y, double z) : x(x), y(y), z(z)
     {
-        this->UpdateIsNormalizedVariable();
-        this->UpdateIsZeroVariable();
     }
 
     vec3(std::initializer_list<double> const il)
@@ -32,9 +30,6 @@ public:
             *d = v;
             i++;
         }
-
-        this->UpdateIsNormalizedVariable();
-        this->UpdateIsZeroVariable();
     }
 
     ~vec3()
@@ -46,9 +41,6 @@ public:
         this->x = rhs.x;
         this->y = rhs.y;
         this->z = rhs.z;
-
-        this->UpdateIsNormalizedVariable();
-        this->UpdateIsZeroVariable();
     }
 
     vec3 operator+(vec3 const& rhs) { return {x + rhs.x, y + rhs.y, z + rhs.z};}
@@ -60,11 +52,17 @@ public:
 
     bool IsNormalized()
     {
+        // RE: Hack for removing IsNormalized check from the constructors
+        this->UpdateIsNormalizedVariable();
+
         return this->isNormalized;
     }
 
     bool IsZero()
     {
+        // RE: Zero check hack
+        this->UpdateIsZeroVariable();
+
         return this->isZero;
     }
 
