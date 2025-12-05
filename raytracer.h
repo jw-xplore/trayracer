@@ -7,6 +7,8 @@
 #include "object.h"
 #include <float.h>
 #include <chrono>
+#include <thread>
+#include <future>
 
 //------------------------------------------------------------------------------
 /**
@@ -37,6 +39,7 @@ public:
 
     // trace a path and return intersection color
     // n is bounce depth
+    Optional<HitResult> intersectTask(Object* obj, Ray& r, float& tOut);
     Color TracePath(Ray ray, unsigned n);
 
     // get the color of the skybox in a direction

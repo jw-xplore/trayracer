@@ -5,6 +5,7 @@
 #include "sphere.h"
 #include <chrono>
 #include <iostream>
+#include <thread>
 
 #define degtorad(angle) angle * MPI / 180
 
@@ -167,7 +168,8 @@ int main()
     // rendering loop
     while (wnd.IsOpen() && !exit)
     {
-        break;
+        auto frameStart = std::chrono::high_resolution_clock::now();
+        //break;
 
         resetFramebuffer = false;
         moveDir = {0,0,0};
@@ -201,6 +203,8 @@ int main()
         }
 
         // RE: Make raytrace run on other thread
+        //std::thread t([&]() {rt.Raytrace(); });
+        //t.join();
         rt.Raytrace();
         frameIndex++;
 
@@ -222,6 +226,11 @@ int main()
 
         wnd.Blit((float*)&framebufferCopy[0], w, h);
         wnd.SwapBuffers();
+
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> ms_double = frameEnd - frameStart;
+        double frameTime = ms_double.count();
+        std::cout << "FPS: " << 1/frameTime << std::endl;
     }
 
     // Run raytrace

@@ -46,8 +46,7 @@ Raytracer::Raytrace()
                 v = ((float(y + disres) * hFactor) * 2.0f) - 1.0f;
 
                 // RE: direction and ray also takes a many instruction to setup, consider caching?
-                direction = vec3(u, v, -1.0f);
-                direction = transform(direction, this->frustum);
+                direction = transform(vec3(u, v, -1.0f), this->frustum);
                 
                 // RENOTE: Don't recreate the ray, only update magnitude
                 //ray = new Ray(get_position(this->view), direction);
@@ -97,6 +96,12 @@ Raytracer::TracePath(Ray ray, unsigned n)
     }
 
     return this->Skybox(ray.m);
+}
+
+Optional<HitResult> Raytracer::intersectTask(Object* obj, Ray& r, float& tOut)
+{
+    //return Optional<HitResult>();
+    return obj->Intersect(r, tOut);
 }
 
 //------------------------------------------------------------------------------

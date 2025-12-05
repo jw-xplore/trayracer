@@ -62,16 +62,16 @@ public:
         if (discriminant > 0)
         {
             constexpr float minDist = 0.001f;
-            float div = 1.0f / a;
+            //float div = 1.0f / a;
             float sqrtDisc = sqrt(discriminant);
-            float temp = (-b - sqrtDisc) * div;
-            float temp2 = (-b + sqrtDisc) * div;
+            float temp = (-b - sqrtDisc) / a;
+            float temp2 = (-b + sqrtDisc) / a;
 
             if (temp < maxDist && temp > minDist)
             {
                 vec3 p = ray.PointAt(temp);
                 hit.p = p;
-                hit.normal = (p - this->center) * (1.0f / this->radius);
+                hit.normal = (p - this->center) / this->radius;
                 hit.t = temp;
                 hit.object = this;
                 return Optional<HitResult>(hit);
@@ -80,7 +80,7 @@ public:
             {
                 vec3 p = ray.PointAt(temp2);
                 hit.p = p;
-                hit.normal = (p - this->center) * (1.0f / this->radius);
+                hit.normal = (p - this->center) / this->radius;
                 hit.t = temp2;
                 hit.object = this;
                 return Optional<HitResult>(hit);

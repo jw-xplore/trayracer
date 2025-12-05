@@ -34,6 +34,8 @@ public:
 
     bool HasValue()
     {
+        // RE: WTH?
+
         // check if this object has a value.
         if (this->hasValue)
         {

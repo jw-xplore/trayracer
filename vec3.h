@@ -50,6 +50,7 @@ public:
     vec3 operator-(vec3 const& rhs) { return {x - rhs.x, y - rhs.y, z - rhs.z};}
     vec3 operator-() { return {-x, -y, -z};}
     vec3 operator*(float const c) { return {x * c, y * c, z * c};}
+    vec3 operator/(float const c) { return { x / c, y / c, z / c }; }
 
     double x, y, z;
 
