@@ -6,9 +6,96 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <string>
+#include <fstream>
 
 #define degtorad(angle) angle * MPI / 180
 
+/*
+Test program part
+*/
+struct TestData
+{
+    bool ignore = false;
+
+    int width, height, rayCount, spheresCount = 0;
+    bool generateImg = false;
+};
+
+TestData testInput()
+{
+    TestData data;
+
+    std::string input;
+    std::cout << "Run test (n - stardant run/ y + w h raysPerPixels sphereCount createImg): ";
+    std::getline(std::cin, input);
+    input += " ";
+
+    // Ignore
+    if (input[0] == 'n')
+    {
+        data.ignore = true;
+        return data;
+    }
+
+    // Parse
+    int paramNumber = -1;
+    std::string param = "";
+
+    for (int i = 1; i < input.size(); i++)
+    {
+        char c = input[i];
+        if (c == ' ' || i + 1 == input.size())
+        {
+            // Add param
+            if (param != "")
+            {
+                switch (paramNumber)
+                {
+                case 0: data.width = std::stoi(param); break;
+                case 1: data.height = std::stoi(param); break;
+                case 2: data.rayCount = std::stoi(param); break;
+                case 3: data.spheresCount = std::stoi(param); break;
+                case 4:
+                    if (param[0] == 'y')
+                        data.generateImg = true; 
+                    break;
+                }
+
+                param = "";
+            }
+            // Next 
+            paramNumber++;
+            continue;
+        }
+
+        param += input[i];
+    }
+
+    return data;
+}
+
+void createImage(int w, int h)
+{
+    std::ofstream img("testImg.pgm", std::ios_base::out
+        | std::ios_base::binary
+        | std::ios_base::trunc
+    );
+
+    img << "P5\n" << w << " " << h << "\n" << 255 << "\n";
+
+    /*
+    for (int i = 0; i < h; ++i)
+        img.write(reinterpret_cast<const char*>(bitmap[i]), w);
+
+    */
+
+    img.close();
+}
+
+/*
+Main run
+*/
 int main()
 { 
     Display::Window wnd;
@@ -20,28 +107,40 @@ int main()
 
     std::vector<Color> framebuffer;
 
-    const unsigned w = 200;
-    const unsigned h = 100;
-    framebuffer.resize(w * h);
+    unsigned w = 200;
+    unsigned h = 100;
     
     int raysPerPixel = 1;
     int maxBounces = 5;
 
+    int sphereCount = 12;
+
+    // Setup test
+    TestData test = testInput();
+    if (!test.ignore)
+    {
+        w = test.width;
+        h = test.height;
+        raysPerPixel = test.rayCount;
+        sphereCount = test.spheresCount / 3;
+    }
+
+    framebuffer.resize(w * h);
     Raytracer rt = Raytracer(w, h, framebuffer, raysPerPixel, maxBounces);
 
     // Create some objects
     Material* mat = new Material();
-    mat->type = "Lambertian";
+    mat->type = MaterialType::Lambertian;
     mat->color = { 0.5,0.5,0.5 };
     mat->roughness = 0.3;
     Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
     rt.AddObject(ground);
 
-    for (int it = 0; it < 12; it++)
+    for (int it = 0; it < sphereCount; it++)
     {
         {
             Material* mat = new Material();
-                mat->type = "Lambertian";
+                mat->type = MaterialType::Lambertian;
                 float r = RandomFloat();
                 float g = RandomFloat();
                 float b = RandomFloat();
@@ -57,9 +156,11 @@ int main()
                     },
                     mat);
             rt.AddObject(ground);
-        }{
+        }
+        
+        {
             Material* mat = new Material();
-            mat->type = "Conductor";
+            mat->type = MaterialType::Conductor;
             float r = RandomFloat();
             float g = RandomFloat();
             float b = RandomFloat();
@@ -77,7 +178,7 @@ int main()
             rt.AddObject(ground);
         }{
             Material* mat = new Material();
-            mat->type = "Dielectric";
+            mat->type = MaterialType::Dielectric;
             float r = RandomFloat();
             float g = RandomFloat();
             float b = RandomFloat();
@@ -169,7 +270,6 @@ int main()
     while (wnd.IsOpen() && !exit)
     {
         auto frameStart = std::chrono::high_resolution_clock::now();
-        //break;
 
         resetFramebuffer = false;
         moveDir = {0,0,0};
@@ -231,6 +331,12 @@ int main()
         std::chrono::duration<double> ms_double = frameEnd - frameStart;
         double frameTime = ms_double.count();
         std::cout << "FPS: " << 1/frameTime << std::endl;
+
+        if (!test.ignore)
+        {
+            std::cout << "Time: " << frameTime << "ms" << std::endl;
+            break;
+        }
     }
 
     // Run raytrace
@@ -241,9 +347,9 @@ int main()
 
     double t = ms_double.count();
 
-    std::cout << "Time: " << t << "ms" << std::endl;
+    std::cout << "rt.RayTrace time: " << t << "ms" << std::endl;
 
-    // RE: Note original measured time: 27.0967ms
+    // RE: Note original measured time: 27.0967ms per rt.RayTrace call
 
     if (wnd.IsOpen())
         wnd.Close();
