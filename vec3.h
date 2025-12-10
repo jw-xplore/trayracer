@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <assert.h>
 #include <immintrin.h>
+#include <vector>
 
 #define MPI 3.14159265358979323846
 
@@ -21,18 +22,11 @@ public:
     {
     }
 
-    vec3(std::initializer_list<double> const il)
-    {
-        assert(il.size() == 3);
-
-        int i = 0;
-        for (auto v : il)
-        {
-            double* d = reinterpret_cast<double*>(this);
-            d += i;
-            *d = v;
-            i++;
-        }
+    vec3(double* il)
+    {     
+        this->x = il[0];
+        this->y = il[1];
+        this->z = il[2];
     }
 
     ~vec3()
@@ -79,7 +73,7 @@ inline double len(vec3 const& v)
 }
 
 // Get normalized version of v
-inline vec3 normalize(vec3 v)
+inline vec3 normalize(vec3 const& v)
 {
     double l = len(v);
     if (l == 0)
@@ -90,7 +84,7 @@ inline vec3 normalize(vec3 v)
 }
 
 // piecewise multiplication between two vectors
-inline vec3 mul(vec3 a, vec3 b)
+inline vec3 mul(vec3 const& a, vec3 const& b)
 {
     return {a.x * b.x, a.y * b.y, a.z * b.z};
 }
@@ -101,7 +95,7 @@ inline vec3 add(vec3 a, vec3 b)
     return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
-inline float dot(vec3 a, vec3 b)
+inline float dot(vec3 const& a, vec3 const& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -111,7 +105,7 @@ inline vec3 reflect(vec3 v, vec3 n)
     return v - n * (2 * dot(v,n));
 }
 
-inline vec3 cross(vec3 a, vec3 b)
+inline vec3 cross(vec3 const& a, vec3 const& b)
 {
     return { a.y * b.z - a.z * b.y,
              a.z * b.x - a.x * b.z,

@@ -75,7 +75,7 @@ TestData testInput()
     return data;
 }
 
-void createImage(int w, int h)
+void createImage(int w, int h, std::vector<Color>& renderResult)
 {
     std::ofstream img("testImg.pgm", std::ios_base::out
         | std::ios_base::binary
@@ -84,12 +84,23 @@ void createImage(int w, int h)
 
     img << "P5\n" << w << " " << h << "\n" << 255 << "\n";
 
-    /*
-    for (int i = 0; i < h; ++i)
-        img.write(reinterpret_cast<const char*>(bitmap[i]), w);
+    char* line = new char[w];
+    int pos = 0;
 
-    */
+    for (int y = 0; y < h; ++y)
+    {
+        for (int x = 0; x < w; ++x)
+        {
+            pos = w * y + x;
+            line[x] = ((renderResult[pos].r + renderResult[pos].g + renderResult[pos].b) * 255) / 3;
+        }
+        
+        //std::cout << line << std::endl;
 
+        img.write(reinterpret_cast<const char*>(line), w);
+    }
+
+    delete line;
     img.close();
 }
 
@@ -330,11 +341,12 @@ int main()
         auto frameEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> ms_double = frameEnd - frameStart;
         double frameTime = ms_double.count();
-        std::cout << "FPS: " << 1/frameTime << std::endl;
+        std::cout << "FPS: " << 1/frameTime << ", ms: " << frameTime << std::endl;
 
         if (!test.ignore)
         {
             std::cout << "Time: " << frameTime << "ms" << std::endl;
+            createImage(w, h, framebuffer);
             break;
         }
     }

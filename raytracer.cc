@@ -156,11 +156,11 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
         Object* object = this->objects[i];
 
         // RE: Type casting could be an issue?
-        auto opt = object->Intersect(ray, closestHit.t);
-        if (opt.HasValue())
+        hit = object->Intersect(ray, closestHit.t);
+
+        if (hit.t < FLT_MAX)
         {
-            hit = opt.Get();
-            assert(hit.t < closestHit.t);
+            assert(hit.t < closestHit.t); // RE: Make conditions out assert?
             closestHit = hit;
             closestHit.object = object;
             isHit = true;
