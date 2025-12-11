@@ -33,15 +33,19 @@ Raytracer::Raytrace()
     float wFactor = (1.0f / this->width);
     float hFactor = (1.0f / this->height);
 
+
+    float disres;
+    double rppDiv = 1 / this->rpp;
+    Color color;
+
     for (int x = 0; x < this->width; ++x)
     {
         for (int y = 0; y < this->height; ++y)
         {
-            Color color;
             for (int i = 0; i < this->rpp; ++i)
             {
                 // RE: u and v setting takes around 18 instruction each
-                float disres = dis(generator);
+                disres = dis(generator);
                 u = ((float(x + disres) * wFactor) * 2.0f) - 1.0f;
                 v = ((float(y + disres) * hFactor) * 2.0f) - 1.0f;
 
@@ -51,13 +55,13 @@ Raytracer::Raytrace()
                 // RENOTE: Don't recreate the ray, only update magnitude
                 //ray = new Ray(get_position(this->view), direction);
                 ray->m = direction;
-                color += this->TracePath(*ray, 0);
+                color = this->TracePath(*ray, 0);
             }
 
             // divide by number of samples per pixel, to get the average of the distribution
-            color.r /= this->rpp;
-            color.g /= this->rpp;
-            color.b /= this->rpp;
+            color.r *= rppDiv;
+            color.g *= rppDiv;
+            color.b *= rppDiv;
 
             this->frameBuffer[y * this->width + x] += color;
         }

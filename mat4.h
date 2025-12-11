@@ -56,24 +56,19 @@ get_position(mat4 m)
     transform vector with matrix basis
 */
 inline vec3
-transform(vec3 v, mat4 m)
+transform(vec3 const& v, mat4 const& m)
 {
-    //swizzle!
-    //this should be easy to vectorize! ;)
-    vec3 x = {v.x, v.x, v.x};
-    vec3 y = {v.y, v.y, v.y};
-    vec3 z = {v.z, v.z, v.z};
-    vec3 r0 = { m.m00, m.m01, m.m02 };
-    vec3 r1 = { m.m10, m.m11, m.m12 };
-    vec3 r2 = { m.m20, m.m21, m.m22 };
+    double x = v.x;
+    double y = v.y;
+    double z = v.z;
+
     // multiply
-    vec3 a = mul(x, r0);
-    vec3 b = mul(y, r1);
-    vec3 c = mul(z, r2);
+    vec3 a = { m.m00 * x, m.m01 * x, m.m02 * x };
+    vec3 b = { m.m10 * y, m.m11 * y, m.m12 * y };
+    vec3 c = { m.m20 * z, m.m21 * z, m.m22 * z };
+
     // add
-    vec3 res = add(a,b);
-    res = add(res,c);
-    return res;
+    return  a + b + c;
 }
 
 //------------------------------------------------------------------------------
@@ -87,19 +82,19 @@ TBN(vec3 normal)
     ret.m10 = normal.x;
     ret.m11 = normal.y;
     ret.m12 = normal.z;
-    ret.m13 = 0.0f;
+    ret.m13 = 0;
 
-    if (normal.z < -0.999805696f)
+    if (normal.z < -1)
     {
-        ret.m00 = 0.0f;
-        ret.m01 = -1.0f;
-        ret.m02 = 0.0f;
-        ret.m03 = 0.0f;
+        ret.m00 = 0;
+        ret.m01 = -1;
+        ret.m02 = 0;
+        ret.m03 = 0;
 
-        ret.m20 = -1.0f;
-        ret.m21 = 0.0f;
-        ret.m22 = 0.0f;
-        ret.m23 = 0.0f;
+        ret.m20 = -1;
+        ret.m21 = 0;
+        ret.m22 = 0;
+        ret.m23 = 0;
     }
     else
     {
@@ -109,12 +104,12 @@ TBN(vec3 normal)
         ret.m00 = 1.0f - normal.x * normal.x * a;
         ret.m01 = b;
         ret.m02 = -normal.x;
-        ret.m03 = 0.0f;
+        ret.m03 = 0;
 
         ret.m20 = b;
         ret.m21 = 1.0f - normal.y * normal.y * a;
         ret.m22 = normal.y;
-        ret.m23 = 0.0f;
+        ret.m23 = 0;
     }
 
     ret.m30 = 0.0f;

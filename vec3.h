@@ -65,11 +65,13 @@ private:
 // Get length of 3D vector
 inline double len(vec3 const& v)
 {
+    // RE: Split add varint seems to be faster than inline variant
     double a = v.x * v.x;
-    a = a + v.y * v.y;
-    a = a + v.z * v.z;
-    double l = sqrt(a);
-    return l;
+    a += v.y * v.y;
+    a += v.z * v.z;
+
+    //double a = v.x * v.x + v.y * v.y + v.z * v.z;
+    return sqrt(a);
 }
 
 // Get normalized version of v
@@ -77,10 +79,11 @@ inline vec3 normalize(vec3 const& v)
 {
     double l = len(v);
     if (l == 0)
-        return vec3(0,0,0);
+        return vec3(0, 0, 0);
 
-    vec3 ret = vec3(v.x / l, v.y / l, v.z / l);
-    return vec3(ret);
+    //vec3 ret = vec3(v.x / l, v.y / l, v.z / l);
+    //return vec3(ret);
+    return vec3(v.x / l, v.y / l, v.z / l);
 }
 
 // piecewise multiplication between two vectors

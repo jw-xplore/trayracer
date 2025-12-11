@@ -293,7 +293,8 @@ int main()
         rotx -= pitch;
         roty -= yaw;
 
-        moveDir = normalize(moveDir);
+        // RE: not needed since it is always 0
+        //moveDir = normalize(moveDir);
 
         mat4 xMat = (rotationx(rotx));
         mat4 yMat = (rotationy(roty));
@@ -341,11 +342,11 @@ int main()
         auto frameEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> ms_double = frameEnd - frameStart;
         double frameTime = ms_double.count();
-        std::cout << "FPS: " << 1/frameTime << ", ms: " << frameTime << std::endl;
+        std::cout << "FPS: " << 1/frameTime << ", s: " << frameTime << std::endl;
 
         if (!test.ignore)
         {
-            std::cout << "Time: " << frameTime << "ms" << std::endl;
+            std::cout << "Time: " << frameTime << "s" << std::endl;
             createImage(w, h, framebuffer);
             break;
         }
@@ -359,7 +360,7 @@ int main()
 
     double t = ms_double.count();
 
-    std::cout << "rt.RayTrace time: " << t << "ms" << std::endl;
+    std::cout << "rt.RayTrace time: " << t << "s" << std::endl;
 
     // RE: Note original measured time: 27.0967ms per rt.RayTrace call
 
