@@ -152,9 +152,7 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
     }
     */
 
-    int objSize = this->objects.size();
-
-    for (int i = 0; i < objSize; i++)
+    for (int i = 0; i < objectsSize; i++)
     {
         // RE: Is auto taking more than strong typing?
         Object* object = this->objects[i];

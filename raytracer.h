@@ -67,14 +67,20 @@ public:
     // Go from canonical to view frustum
     mat4 frustum;
 
+    // Static allocation
+    int objectsSize;
+    Object** objects;
+
 private:
-    std::vector<Object*> objects;
+    //std::vector<Object*> objects;
 };
 
+/*
 inline void Raytracer::AddObject(Object* o)
 {
     this->objects.push_back(o);
 }
+*/
 
 inline void Raytracer::SetViewMatrix(mat4 val)
 {

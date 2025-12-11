@@ -145,9 +145,13 @@ int main()
     mat->color = { 0.5,0.5,0.5 };
     mat->roughness = 0.3;
     Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
-    rt.AddObject(ground);
 
-    for (int it = 0; it < sphereCount; it++)
+    rt.objectsSize = sphereCount;
+    rt.objects = new Object * [sphereCount];
+    rt.objects[0] = ground;
+    //rt.AddObject(ground);
+
+    for (int it = 1; it < sphereCount; it++)
     {
         {
             Material* mat = new Material();
@@ -166,7 +170,8 @@ int main()
                         RandomFloatNTP() * span
                     },
                     mat);
-            rt.AddObject(ground);
+            //rt.AddObject(ground);
+            rt.objects[it] = ground;
         }
         
         {
@@ -186,7 +191,8 @@ int main()
                     RandomFloatNTP() * span
                 },
                 mat);
-            rt.AddObject(ground);
+            //rt.AddObject(ground);
+            rt.objects[it] = ground;
         }{
             Material* mat = new Material();
             mat->type = MaterialType::Dielectric;
@@ -205,7 +211,8 @@ int main()
                     RandomFloatNTP() * span
                 },
                 mat);
-            rt.AddObject(ground);
+            //rt.AddObject(ground);
+            rt.objects[it] = ground;
         }
     }
     
