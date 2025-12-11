@@ -16,7 +16,7 @@
 class Raytracer
 {
 public:
-    Raytracer(unsigned w, unsigned h, std::vector<Color>& frameBuffer, unsigned rpp, unsigned bounces);
+    Raytracer(unsigned w, unsigned h, Color*& frameBuffer, unsigned rpp, unsigned bounces);
     ~Raytracer() { }
 
     // start raytracing!
@@ -26,7 +26,7 @@ public:
     void AddObject(Object* obj);
 
     // single raycast, find object
-    bool Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance);
+    bool Raycast(Ray& ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance);
 
     // set camera matrix
     void SetViewMatrix(mat4 val);
@@ -40,12 +40,14 @@ public:
     // trace a path and return intersection color
     // n is bounce depth
     Optional<HitResult> intersectTask(Object* obj, Ray& r, float& tOut);
-    Color TracePath(Ray ray, unsigned n);
+    Color TracePath(Ray& ray, unsigned n);
 
     // get the color of the skybox in a direction
     Color Skybox(vec3 direction);
 
-    std::vector<Color>& frameBuffer;
+    //std::vector<Color>& frameBuffer;
+    Color*& frameBuffer;
+    int frameBufferSize;
     
     // rays per pixel
     unsigned rpp;
@@ -73,6 +75,7 @@ public:
 
 private:
     //std::vector<Object*> objects;
+    Ray* scatteredRay;
 };
 
 /*

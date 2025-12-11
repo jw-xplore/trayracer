@@ -19,7 +19,7 @@ struct mat4
 /**
 */
 inline vec3
-get_row0(mat4 m)
+get_row0(mat4 const& m)
 {
     return {m.m00, m.m01, m.m02};
 }
@@ -28,7 +28,7 @@ get_row0(mat4 m)
 /**
 */
 inline vec3
-get_row1(mat4 m)
+get_row1(mat4 const& m)
 {
     return { m.m10, m.m11, m.m12 };
 }
@@ -37,7 +37,7 @@ get_row1(mat4 m)
 /**
 */
 inline vec3
-get_row2(mat4 m)
+get_row2(mat4 const& m)
 {
     return { m.m20, m.m21, m.m22 };
 }
@@ -46,7 +46,7 @@ get_row2(mat4 m)
 /**
 */
 inline vec3
-get_position(mat4 m)
+get_position(mat4 const& m)
 {
     return { m.m30, m.m31, m.m32 };
 }
@@ -124,7 +124,7 @@ TBN(vec3 normal)
     Calculate determinant
 */
 inline float
-det(mat4 m)
+det(mat4 const& m)
 {
     return 
         (m.m00 * m.m11 - m.m01 * m.m10) * (m.m22 * m.m33 - m.m23 * m.m32)
@@ -140,7 +140,7 @@ det(mat4 m)
     Calculate inverse of matrix
 */
 inline mat4
-inverse(mat4 m)
+inverse(mat4 const& m)
 {
     float s = det(m);
     
@@ -172,7 +172,7 @@ inverse(mat4 m)
     Flip it!
 */
 inline mat4
-transpose(mat4 m)
+transpose(mat4 const& m)
 {
     return {
         m.m00, m.m10, m.m20, m.m30,
@@ -186,7 +186,7 @@ transpose(mat4 m)
 /**
 */
 inline mat4
-multiply(mat4 b, mat4 a)
+multiply(mat4 const& b, mat4 const& a)
 {
     return { b.m00*a.m00 + b.m10*a.m01 + b.m20*a.m02 + b.m30*a.m03,
              b.m01*a.m00 + b.m11*a.m01 + b.m21*a.m02 + b.m31*a.m03,

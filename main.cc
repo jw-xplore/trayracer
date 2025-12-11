@@ -116,8 +116,6 @@ int main()
     if (!wnd.Open())
         return 1;
 
-    std::vector<Color> framebuffer;
-
     unsigned w = 200;
     unsigned h = 100;
     
@@ -136,7 +134,11 @@ int main()
         sphereCount = test.spheresCount / 3;
     }
 
-    framebuffer.resize(w * h);
+    //framebuffer.resize(w * h);
+    int frameBufferSize = w * h;
+    Color* framebuffer = new Color[frameBufferSize];
+    Color* framebufferCopy = new Color[frameBufferSize];
+
     Raytracer rt = Raytracer(w, h, framebuffer, raysPerPixel, maxBounces);
 
     // Create some objects
@@ -281,8 +283,8 @@ int main()
     // number of accumulated frames
     int frameIndex = 0;
 
-    std::vector<Color> framebufferCopy;
-    framebufferCopy.resize(w * h);
+    //std::vector<Color> framebufferCopy;
+    //framebufferCopy.resize(w * h);
 
     // rendering loop
     while (wnd.IsOpen() && !exit)
@@ -329,6 +331,7 @@ int main()
 
         // Get the average distribution of all samples
         {
+            /*
             size_t p = 0;
             for (Color const& pixel : framebuffer)
             {
@@ -337,6 +340,15 @@ int main()
                 framebufferCopy[p].g /= frameIndex;
                 framebufferCopy[p].b /= frameIndex;
                 p++;
+            }
+            */
+
+            for (size_t p = 0; p < frameBufferSize; p++)
+            {
+                framebufferCopy[p] = framebuffer[p];
+                framebufferCopy[p].r /= frameIndex;
+                framebufferCopy[p].g /= frameIndex;
+                framebufferCopy[p].b /= frameIndex;
             }
         }
 
@@ -351,12 +363,17 @@ int main()
         double frameTime = ms_double.count();
         std::cout << "FPS: " << 1/frameTime << ", s: " << frameTime << std::endl;
 
+        /*
         if (!test.ignore)
         {
             std::cout << "Time: " << frameTime << "s" << std::endl;
-            createImage(w, h, framebuffer);
+
+            //if (test.generateImg)
+                //createImage(w, h, framebuffer);
+            
             break;
         }
+        */
     }
 
     // Run raytrace

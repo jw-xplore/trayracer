@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 /**
 */
-Raytracer::Raytracer(unsigned w, unsigned h, std::vector<Color>& frameBuffer, unsigned rpp, unsigned bounces) :
+Raytracer::Raytracer(unsigned w, unsigned h, Color*& frameBuffer, unsigned rpp, unsigned bounces) :
     frameBuffer(frameBuffer),
     rpp(rpp),
     bounces(bounces),
@@ -12,6 +12,7 @@ Raytracer::Raytracer(unsigned w, unsigned h, std::vector<Color>& frameBuffer, un
     height(h)
 {
     // empty
+    frameBufferSize = w * h;
 }
 
 //------------------------------------------------------------------------------
@@ -37,12 +38,15 @@ Raytracer::Raytrace()
     float disres;
     double rppDiv = 1 / this->rpp;
     Color color;
+    size_t y;
+    size_t i;
+    int fbPos = 0;
 
-    for (int x = 0; x < this->width; ++x)
+    for (size_t x = 0; x < this->width; ++x)
     {
-        for (int y = 0; y < this->height; ++y)
+        for (y = 0; y < this->height; ++y)
         {
-            for (int i = 0; i < this->rpp; ++i)
+            for (i = 0; i < this->rpp; ++i)
             {
                 // RE: u and v setting takes around 18 instruction each
                 disres = dis(generator);
@@ -50,7 +54,7 @@ Raytracer::Raytrace()
                 v = ((float(y + disres) * hFactor) * 2.0f) - 1.0f;
 
                 // RE: direction and ray also takes a many instruction to setup, consider caching?
-                direction = transform(vec3(u, v, -1.0f), this->frustum);
+                direction = transform({ u, v, -1.0f }, this->frustum);
                 
                 // RENOTE: Don't recreate the ray, only update magnitude
                 //ray = new Ray(get_position(this->view), direction);
@@ -63,7 +67,8 @@ Raytracer::Raytrace()
             color.g *= rppDiv;
             color.b *= rppDiv;
 
-            this->frameBuffer[y * this->width + x] += color;
+            fbPos = y * this->width + x;
+            this->frameBuffer[fbPos] = this->frameBuffer[fbPos] + color;
         }
     }
 
@@ -75,7 +80,7 @@ Raytracer::Raytrace()
  * @parameter n - the current bounce level
 */
 Color
-Raytracer::TracePath(Ray ray, unsigned n)
+Raytracer::TracePath(Ray& ray, unsigned n)
 {
     vec3 hitPoint;
     vec3 hitNormal;
@@ -86,12 +91,11 @@ Raytracer::TracePath(Ray ray, unsigned n)
     if (Raycast(ray, hitPoint, hitNormal, hitObject, distance))
     {
         // RE: ray creation take a lot of instruction + deleting it just add lot of load for each iteration
-        Ray* scatteredRay = new Ray(hitObject->ScatterRay(ray, hitPoint, hitNormal));
+        scatteredRay = &hitObject->ScatterRay(ray, hitPoint, hitNormal);
         if (n < this->bounces)
         {
             return hitObject->GetColor() * this->TracePath(*scatteredRay, n + 1);
         }
-        delete scatteredRay;
 
         if (n == this->bounces)
         {
@@ -112,7 +116,7 @@ Optional<HitResult> Raytracer::intersectTask(Object* obj, Ray& r, float& tOut)
 /**
 */
 bool
-Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
+Raytracer::Raycast(Ray& ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
 {
     bool isHit = false;
     HitResult closestHit;
@@ -189,11 +193,20 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
 void
 Raytracer::Clear()
 {
+    /*
     for (auto& color : this->frameBuffer)
     {
         color.r = 0.0f;
         color.g = 0.0f;
         color.b = 0.0f;
+    }
+    */
+
+    for (size_t p = 0; p < frameBufferSize; p++)
+    {
+        frameBuffer[p].r = 0.0f;
+        frameBuffer[p].g = 0.0f;
+        frameBuffer[p].b = 0.0f;
     }
 }
 
