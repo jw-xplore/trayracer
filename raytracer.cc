@@ -19,7 +19,7 @@ Raytracer::Raytracer(unsigned w, unsigned h, Color*& frameBuffer, unsigned rpp, 
 /**
 */
 void
-Raytracer::Raytrace()
+Raytracer::Raytrace(int start, int w)
 {
     static int leet = 1337;
     std::mt19937 generator (leet++);
@@ -42,7 +42,9 @@ Raytracer::Raytrace()
     size_t i;
     int fbPos = 0;
 
-    for (size_t x = 0; x < this->width; ++x)
+    w += start;
+
+    for (size_t x = start; x < w; ++x)
     {
         for (y = 0; y < this->height; ++y)
         {
@@ -73,6 +75,44 @@ Raytracer::Raytrace()
     }
 
     delete ray;
+}
+
+void Raytracer::RaytraceThreaded()
+{
+    int w = this->width * 0.0625f;
+    std::thread t1(&Raytracer::Raytrace, this, 0, w);
+    std::thread t2(&Raytracer::Raytrace, this, w, w);
+    std::thread t3(&Raytracer::Raytrace, this, w + w, w);
+    std::thread t4(&Raytracer::Raytrace, this, w + w * 2, w);
+    std::thread t5(&Raytracer::Raytrace, this, w + w * 3, w);
+    std::thread t6(&Raytracer::Raytrace, this, w + w * 4, w);
+    std::thread t7(&Raytracer::Raytrace, this, w + w * 5, w);
+    std::thread t8(&Raytracer::Raytrace, this, w + w * 6, w);
+    std::thread t9(&Raytracer::Raytrace, this, w + w * 7, w);
+    std::thread t10(&Raytracer::Raytrace, this, w + w * 8, w);
+    std::thread t11(&Raytracer::Raytrace, this, w + w * 9, w);
+    std::thread t12(&Raytracer::Raytrace, this, w + w * 10, w);
+    std::thread t13(&Raytracer::Raytrace, this, w + w * 11, w);
+    std::thread t14(&Raytracer::Raytrace, this, w + w * 12, w);
+    std::thread t15(&Raytracer::Raytrace, this, w + w * 13, w);
+    std::thread t16(&Raytracer::Raytrace, this, w + w * 14, w);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+    t7.join();
+    t8.join();
+    t9.join();
+    t10.join();
+    t11.join();
+    t12.join();
+    t13.join();
+    t14.join();
+    t15.join();
+    t16.join();
 }
 
 //------------------------------------------------------------------------------

@@ -324,32 +324,19 @@ int main()
         }
 
         // RE: Make raytrace run on other thread
-        //std::thread t([&]() {rt.Raytrace(); });
-        //t.join();
-        rt.Raytrace();
+        //std::thread threadRaytrace(RaytraceTask, &rt);
+        //threadRaytrace.join();
+        //rt.Raytrace(0, w);
+        rt.RaytraceThreaded();
         frameIndex++;
 
         // Get the average distribution of all samples
+        for (size_t p = 0; p < frameBufferSize; p++)
         {
-            /*
-            size_t p = 0;
-            for (Color const& pixel : framebuffer)
-            {
-                framebufferCopy[p] = pixel;
-                framebufferCopy[p].r /= frameIndex;
-                framebufferCopy[p].g /= frameIndex;
-                framebufferCopy[p].b /= frameIndex;
-                p++;
-            }
-            */
-
-            for (size_t p = 0; p < frameBufferSize; p++)
-            {
-                framebufferCopy[p] = framebuffer[p];
-                framebufferCopy[p].r /= frameIndex;
-                framebufferCopy[p].g /= frameIndex;
-                framebufferCopy[p].b /= frameIndex;
-            }
+            framebufferCopy[p] = framebuffer[p];
+            framebufferCopy[p].r /= frameIndex;
+            framebufferCopy[p].g /= frameIndex;
+            framebufferCopy[p].b /= frameIndex;
         }
 
         glClearColor(0, 0, 0, 1.0);
@@ -378,7 +365,7 @@ int main()
 
     // Run raytrace
     auto start = std::chrono::high_resolution_clock::now();
-    rt.Raytrace();
+    //rt.Raytrace(w);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> ms_double = end - start;
 
