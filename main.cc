@@ -32,6 +32,8 @@ int main()
     mat->color = { 0.5,0.5,0.5 };
     mat->roughness = 0.3;
     Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
+
+    rt.SetupObjects(37);
     rt.AddObject(ground);
 
     for (int it = 0; it < 12; it++)

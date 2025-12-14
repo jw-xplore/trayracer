@@ -93,11 +93,7 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
     int numHits = 0;
     HitResult hit;
 
-    // First, sort the world objects
-    //std::sort(world.begin(), world.end()); // RE: Maybe have sorting at start once?
-
-    int size = this->objects.size();
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < objectsSize; i++)
     {
         Object* object = this->objects[i];
 

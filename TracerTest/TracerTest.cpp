@@ -20,7 +20,7 @@ namespace TracerTest
             const unsigned h = 100;
             framebuffer.resize(w * h);
 
-            int raysPerPixel = 1;
+            int raysPerPixel = 2;
             int maxBounces = 5;
 
             Raytracer rt = Raytracer(w, h, framebuffer, raysPerPixel, maxBounces);
@@ -31,9 +31,11 @@ namespace TracerTest
             mat->color = { 0.5,0.5,0.5 };
             mat->roughness = 0.3;
             Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
+
+            rt.SetupObjects(901);
             rt.AddObject(ground);
 
-            for (int it = 0; it < 12; it++)
+            for (int it = 0; it < 300; it++)
             {
                 {
                     Material* mat = new Material();

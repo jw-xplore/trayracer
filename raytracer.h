@@ -21,6 +21,8 @@ public:
     // start raytracing!
     void Raytrace();
 
+    void SetupObjects(int size);
+
     // add object to scene
     void AddObject(Object* obj);
 
@@ -66,12 +68,21 @@ public:
     mat4 frustum;
 
 private:
-    std::vector<Object*> objects;
+    Object** objects;
+    int objectsSize = 0;
+    int lastAddedObject = 0;
 };
+
+inline void Raytracer::SetupObjects(int size)
+{
+    objectsSize = size;
+    objects = new Object*[size];
+}
 
 inline void Raytracer::AddObject(Object* o)
 {
-    this->objects.push_back(o);
+    objects[lastAddedObject] = o;
+    lastAddedObject++;
 }
 
 inline void Raytracer::SetViewMatrix(mat4 val)

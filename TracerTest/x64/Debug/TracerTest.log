@@ -1,5 +1,5 @@
 ﻿  TracerTest.cpp
-C:\School\GameSystems\trayracer\vec3.h(138,34): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\School\GameSystems\trayracer\vec3.h(91,34): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
   (compiling source file '/TracerTest.cpp')
   
 C:\School\GameSystems\trayracer\mat4.h(87,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
@@ -68,7 +68,7 @@ C:\School\GameSystems\trayracer\material.h(23,29): warning C4305: 'initializing'
 C:\School\GameSystems\trayracer\TracerTest\TracerTest.cpp(32,30): warning C4305: '=': truncation from 'double' to 'float'
   (compiling source file '/TracerTest.cpp')
   
-C:\School\GameSystems\trayracer\TracerTest\TracerTest.cpp(82,44): warning C4305: '=': truncation from 'double' to 'float'
+C:\School\GameSystems\trayracer\TracerTest\TracerTest.cpp(84,44): warning C4305: '=': truncation from 'double' to 'float'
   (compiling source file '/TracerTest.cpp')
   
      Creating library C:\School\GameSystems\trayracer\bin\x64\Debug\TracerTest.lib and object C:\School\GameSystems\trayracer\bin\x64\Debug\TracerTest.exp
