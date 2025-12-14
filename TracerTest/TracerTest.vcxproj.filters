@@ -26,5 +26,11 @@
     <ClInclude Include="pch.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
+    <ClInclude Include="..\raytracer.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\color.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

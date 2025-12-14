@@ -64,7 +64,7 @@ Raytracer::TracePath(Ray ray, unsigned n)
     Object* hitObject = nullptr;
     float distance = FLT_MAX;
 
-    if (Raycast(ray, hitPoint, hitNormal, hitObject, distance, this->objects))
+    if (Raycast(ray, hitPoint, hitNormal, hitObject, distance))
     {
         Ray* scatteredRay = new Ray(hitObject->ScatterRay(ray, hitPoint, hitNormal));
         if (n < this->bounces)
@@ -86,7 +86,7 @@ Raytracer::TracePath(Ray ray, unsigned n)
 /**
 */
 bool
-Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance, std::vector<Object*> world)
+Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
 {
     bool isHit = false;
     HitResult closestHit;
@@ -94,31 +94,12 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
     HitResult hit;
 
     // First, sort the world objects
-    std::sort(world.begin(), world.end()); // RE: Maybe have ssorting at start once?
+    //std::sort(world.begin(), world.end()); // RE: Maybe have sorting at start once?
 
-    // then add all objects into a remaining objects set of unique objects, so that we don't trace against the same object twice
-    std::vector<Object*> uniqueObjects;
-    for (size_t i = 0; i < world.size(); ++i)
+    int size = this->objects.size();
+    for (size_t i = 0; i < size; i++)
     {
-        Object* obj = world[i];
-        // RE: WTH is this shit?
-        std::vector<Object*>::iterator it = std::find_if(uniqueObjects.begin(), uniqueObjects.end(), 
-                [obj](const auto& val)
-                {
-                    return (obj->GetName() == val->GetName() && obj->GetId() == val->GetId());
-                }
-            );
-
-        if (it == uniqueObjects.end())
-        {
-            uniqueObjects.push_back(obj);
-        }
-    }
-
-    while (uniqueObjects.size() > 0)
-    {
-        auto objectIt = uniqueObjects.begin();
-        Object* object = *objectIt;
+        Object* object = this->objects[i];
 
         auto opt = object->Intersect(ray, closestHit.t);
         if (opt.HasValue())
@@ -130,7 +111,6 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
             isHit = true;
             numHits++;
         }
-        uniqueObjects.erase(objectIt);
     }
 
     hitPoint = closestHit.p;

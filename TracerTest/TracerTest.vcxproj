@@ -100,6 +100,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)trayracer.dir\Debug\raytracer.obj;$(SolutionDir)trayracer.dir\Debug\random.obj;$(SolutionDir)trayracer.dir\Debug\material.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -165,7 +166,20 @@
     <ClCompile Include="TracerTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\color.h" />
+    <ClInclude Include="..\raytracer.h" />
     <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\bin\ALL_BUILD.vcxproj">
+      <Project>{b260bf39-be73-3762-9ac2-711bce8b2c29}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bin\trayracer.vcxproj">
+      <Project>{1928a635-4a2e-3713-8eb6-d4cdc9be1497}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bin\ZERO_CHECK.vcxproj">
+      <Project>{68e08a11-b1d9-3ac7-a73d-1c77f7f285a0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
