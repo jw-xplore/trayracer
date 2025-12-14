@@ -18,38 +18,88 @@ Raytracer::Raytracer(unsigned w, unsigned h, std::vector<Color>& frameBuffer, un
 /**
 */
 void
-Raytracer::Raytrace()
+Raytracer::Raytrace(int start, int w)
 {
     static int leet = 1337;
     std::mt19937 generator (leet++);
     std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
-    for (int x = 0; x < this->width; ++x)
+    float u;
+    float v;
+    vec3 direction;
+    Ray* ray = new Ray();
+    double colorDiv = 1.0f / this->rpp;
+
+    w += start;
+
+    for (size_t x = start; x < w; ++x)
     {
-        for (int y = 0; y < this->height; ++y)
+        for (size_t y = 0; y < this->height; ++y)
         {
             Color color;
-            for (int i = 0; i < this->rpp; ++i)
+            for (size_t i = 0; i < this->rpp; ++i)
             {
-                float u = ((float(x + dis(generator)) * (1.0f / this->width)) * 2.0f) - 1.0f;
-                float v = ((float(y + dis(generator)) * (1.0f / this->height)) * 2.0f) - 1.0f;
+                u = ((float(x + dis(generator)) * (1.0f / this->width)) * 2.0f) - 1.0f;
+                v = ((float(y + dis(generator)) * (1.0f / this->height)) * 2.0f) - 1.0f;
 
-                vec3 direction = vec3(u, v, -1.0f);
+                direction = vec3(u, v, -1.0f);
                 direction = transform(direction, this->frustum);
                 
-                Ray* ray = new Ray(get_position(this->view), direction);
+                //Ray* ray = new Ray(get_position(this->view), direction);
+                ray->b = get_position(this->view);
+                ray->m = direction;
                 color += this->TracePath(*ray, 0);
-                delete ray;
+                //delete ray;
             }
 
             // divide by number of samples per pixel, to get the average of the distribution
-            color.r /= this->rpp;
-            color.g /= this->rpp;
-            color.b /= this->rpp;
+            color.r *= colorDiv;
+            color.g *= colorDiv;
+            color.b *= colorDiv;
 
             this->frameBuffer[y * this->width + x] += color;
         }
     }
+
+    delete ray;
+}
+
+void Raytracer::RaytraceThreaded()
+{
+    int w = this->width * 0.0625f;
+    std::thread t1(&Raytracer::Raytrace, this, 0, w);
+    std::thread t2(&Raytracer::Raytrace, this, w, w);
+    std::thread t3(&Raytracer::Raytrace, this, w + w, w);
+    std::thread t4(&Raytracer::Raytrace, this, w + w * 2, w);
+    std::thread t5(&Raytracer::Raytrace, this, w + w * 3, w);
+    std::thread t6(&Raytracer::Raytrace, this, w + w * 4, w);
+    std::thread t7(&Raytracer::Raytrace, this, w + w * 5, w);
+    std::thread t8(&Raytracer::Raytrace, this, w + w * 6, w);
+    std::thread t9(&Raytracer::Raytrace, this, w + w * 7, w);
+    std::thread t10(&Raytracer::Raytrace, this, w + w * 8, w);
+    std::thread t11(&Raytracer::Raytrace, this, w + w * 9, w);
+    std::thread t12(&Raytracer::Raytrace, this, w + w * 10, w);
+    std::thread t13(&Raytracer::Raytrace, this, w + w * 11, w);
+    std::thread t14(&Raytracer::Raytrace, this, w + w * 12, w);
+    std::thread t15(&Raytracer::Raytrace, this, w + w * 13, w);
+    std::thread t16(&Raytracer::Raytrace, this, w + w * 14, w);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+    t7.join();
+    t8.join();
+    t9.join();
+    t10.join();
+    t11.join();
+    t12.join();
+    t13.join();
+    t14.join();
+    t15.join();
+    t16.join();
 }
 
 //------------------------------------------------------------------------------
@@ -66,12 +116,13 @@ Raytracer::TracePath(Ray ray, unsigned n)
 
     if (Raycast(ray, hitPoint, hitNormal, hitObject, distance))
     {
-        Ray* scatteredRay = new Ray(hitObject->ScatterRay(ray, hitPoint, hitNormal));
+        //Ray* scatteredRay = new Ray(hitObject->ScatterRay(ray, hitPoint, hitNormal));
+        Ray scatteredRay = hitObject->ScatterRay(ray, hitPoint, hitNormal);
         if (n < this->bounces)
         {
-            return hitObject->GetColor() * this->TracePath(*scatteredRay, n + 1);
+            return hitObject->GetColor() * this->TracePath(scatteredRay, n + 1);
         }
-        delete scatteredRay;
+        //delete scatteredRay;
 
         if (n == this->bounces)
         {
@@ -97,10 +148,10 @@ Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject,
     {
         Object* object = this->objects[i];
 
-        auto opt = object->Intersect(ray, closestHit.t);
-        if (opt.HasValue())
+        hit = object->Intersect(ray, closestHit.t);
+        if (hit.t < FLT_MAX)
         {
-            hit = opt.Get();
+            //hit = opt.Get();
             assert(hit.t < closestHit.t);
             closestHit = hit;
             closestHit.object = object;

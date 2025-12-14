@@ -7,6 +7,8 @@
 class Ray
 {
 public:
+    Ray() {}
+
     Ray(vec3 startpoint, vec3 dir) :
         b(startpoint),
         m(dir)

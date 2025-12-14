@@ -16,8 +16,8 @@ namespace TracerTest
 		TEST_METHOD(Raytrace)
 		{
             std::vector<Color> framebuffer;
-            const unsigned w = 200;
-            const unsigned h = 100;
+            const unsigned w = 500;
+            const unsigned h = 250;
             framebuffer.resize(w * h);
 
             int raysPerPixel = 2;
@@ -27,7 +27,7 @@ namespace TracerTest
             
             // Create some objects
             Material* mat = new Material();
-            mat->type = "Lambertian";
+            mat->type = MaterialType::Lambertian;
             mat->color = { 0.5,0.5,0.5 };
             mat->roughness = 0.3;
             Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
@@ -39,7 +39,7 @@ namespace TracerTest
             {
                 {
                     Material* mat = new Material();
-                    mat->type = "Lambertian";
+                    mat->type = MaterialType::Lambertian;
                     float r = RandomFloat();
                     float g = RandomFloat();
                     float b = RandomFloat();
@@ -57,7 +57,7 @@ namespace TracerTest
                     rt.AddObject(ground);
                 } {
                     Material* mat = new Material();
-                    mat->type = "Conductor";
+                    mat->type = MaterialType::Conductor;
                     float r = RandomFloat();
                     float g = RandomFloat();
                     float b = RandomFloat();
@@ -75,7 +75,7 @@ namespace TracerTest
                     rt.AddObject(ground);
                 } {
                     Material* mat = new Material();
-                    mat->type = "Dielectric";
+                    mat->type = MaterialType::Dielectric;
                     float r = RandomFloat();
                     float g = RandomFloat();
                     float b = RandomFloat();
@@ -96,7 +96,7 @@ namespace TracerTest
             }
 
             auto start = std::chrono::high_resolution_clock::now();
-            rt.Raytrace();
+            rt.RaytraceThreaded();
             auto end = std::chrono::high_resolution_clock::now();
 
             std::chrono::duration<double> time = end - start;

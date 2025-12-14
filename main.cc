@@ -3,6 +3,8 @@
 #include "vec3.h"
 #include "raytracer.h"
 #include "sphere.h"
+#include <iostream>
+#include <chrono>
 
 #define degtorad(angle) angle * MPI / 180
 
@@ -28,7 +30,7 @@ int main()
 
     // Create some objects
     Material* mat = new Material();
-    mat->type = "Lambertian";
+    mat->type = MaterialType::Lambertian;
     mat->color = { 0.5,0.5,0.5 };
     mat->roughness = 0.3;
     Sphere* ground = new Sphere(1000, { 0,-1000, -1 }, mat);
@@ -40,7 +42,7 @@ int main()
     {
         {
             Material* mat = new Material();
-                mat->type = "Lambertian";
+                mat->type = MaterialType::Lambertian;
                 float r = RandomFloat();
                 float g = RandomFloat();
                 float b = RandomFloat();
@@ -58,7 +60,7 @@ int main()
             rt.AddObject(ground);
         }{
             Material* mat = new Material();
-            mat->type = "Conductor";
+            mat->type = MaterialType::Conductor;
             float r = RandomFloat();
             float g = RandomFloat();
             float b = RandomFloat();
@@ -76,7 +78,8 @@ int main()
             rt.AddObject(ground);
         }{
             Material* mat = new Material();
-            mat->type = "Dielectric";
+            std::string str = "Dielectric";
+            mat->type = MaterialType::Dielectric;
             float r = RandomFloat();
             float g = RandomFloat();
             float b = RandomFloat();
@@ -167,6 +170,8 @@ int main()
     // rendering loop
     while (wnd.IsOpen() && !exit)
     {
+        auto frameStart = std::chrono::high_resolution_clock::now();
+
         resetFramebuffer = false;
         moveDir = {0,0,0};
         pitch = 0;
@@ -198,7 +203,7 @@ int main()
             frameIndex = 0;
         }
 
-        rt.Raytrace();
+        rt.RaytraceThreaded();
         frameIndex++;
 
         // Get the average distribution of all samples
@@ -219,6 +224,11 @@ int main()
 
         wnd.Blit((float*)&framebufferCopy[0], w, h);
         wnd.SwapBuffers();
+
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> ms_double = frameEnd - frameStart;
+        double frameTime = ms_double.count();
+        std::cout << "FPS: " << 1 / frameTime << std::endl;
     }
 
     if (wnd.IsOpen())

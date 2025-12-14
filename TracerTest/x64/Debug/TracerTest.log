@@ -62,7 +62,7 @@ C:\School\GameSystems\trayracer\pbr.h(38,40): warning C4244: '=': conversion fro
 C:\School\GameSystems\trayracer\pbr.h(43,48): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   (compiling source file '/TracerTest.cpp')
   
-C:\School\GameSystems\trayracer\material.h(23,29): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\School\GameSystems\trayracer\material.h(29,29): warning C4305: 'initializing': truncation from 'double' to 'float'
   (compiling source file '/TracerTest.cpp')
   
 C:\School\GameSystems\trayracer\TracerTest\TracerTest.cpp(32,30): warning C4305: '=': truncation from 'double' to 'float'

@@ -8,6 +8,7 @@
 #include <float.h>
 #include <chrono>
 #include <random>
+#include <thread>
 
 //------------------------------------------------------------------------------
 /**
@@ -19,7 +20,9 @@ public:
     ~Raytracer() { }
 
     // start raytracing!
-    void Raytrace();
+    void Raytrace(int start, int w);
+
+    void RaytraceThreaded();
 
     void SetupObjects(int size);
 
