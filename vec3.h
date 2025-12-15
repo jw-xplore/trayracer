@@ -86,6 +86,8 @@ inline vec3 add(vec3 const& a, vec3 const& b)
     return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
+#define DOT(a, b) a.x * b.x + a.y * b.y + a.z * b.z;
+
 inline float dot(vec3 const& a, vec3 const& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;

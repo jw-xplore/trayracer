@@ -44,12 +44,10 @@ Raytracer::Raytrace(int start, int w)
 
                 direction = vec3(u, v, -1.0f);
                 direction = transform(direction, this->frustum);
-                
-                //Ray* ray = new Ray(get_position(this->view), direction);
+ 
                 ray->b = get_position(this->view);
                 ray->m = direction;
                 color += this->TracePath(*ray, 0);
-                //delete ray;
             }
 
             // divide by number of samples per pixel, to get the average of the distribution
@@ -107,7 +105,7 @@ void Raytracer::RaytraceThreaded()
  * @parameter n - the current bounce level
 */
 Color
-Raytracer::TracePath(Ray ray, unsigned n)
+Raytracer::TracePath(Ray& ray, unsigned n)
 {
     vec3 hitPoint;
     vec3 hitNormal;
@@ -137,26 +135,24 @@ Raytracer::TracePath(Ray ray, unsigned n)
 /**
 */
 bool
-Raytracer::Raycast(Ray ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
+Raytracer::Raycast(Ray& ray, vec3& hitPoint, vec3& hitNormal, Object*& hitObject, float& distance)
 {
     bool isHit = false;
     HitResult closestHit;
-    int numHits = 0;
+
     HitResult hit;
 
     for (size_t i = 0; i < objectsSize; i++)
     {
         Object* object = this->objects[i];
 
-        hit = object->Intersect(ray, closestHit.t);
-        if (hit.t < FLT_MAX)
+        if (object->Intersect(hit, ray, closestHit.t))
         {
             //hit = opt.Get();
-            assert(hit.t < closestHit.t);
+            //assert(hit.t < closestHit.t);
             closestHit = hit;
             closestHit.object = object;
             isHit = true;
-            numHits++;
         }
     }
 

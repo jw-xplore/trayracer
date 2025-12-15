@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "../raytracer.h"
 #include "../sphere.h"
+#include "ImageGenerator.h"
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -20,7 +21,7 @@ namespace TracerTest
             const unsigned h = 250;
             framebuffer.resize(w * h);
 
-            int raysPerPixel = 2;
+            int raysPerPixel = 1;
             int maxBounces = 5;
 
             Raytracer rt = Raytracer(w, h, framebuffer, raysPerPixel, maxBounces);
@@ -95,12 +96,39 @@ namespace TracerTest
                 }
             }
 
+            // Camera setup
+            vec3 moveDir = { 0,0,0 };
+            float pitch = 0;
+            float yaw = 0;
+            vec3 camPos = { 0,1.0f,10.0f };
+
+            float rotx = 0;
+            float roty = 0;
+
+            // poll input
+           // wnd.Update();
+
+            mat4 xMat = (rotationx(rotx));
+            mat4 yMat = (rotationy(roty));
+            mat4 cameraTransform = multiply(yMat, xMat);
+
+            camPos = camPos + transform(moveDir * 0.2f, cameraTransform);
+
+            cameraTransform.m30 = camPos.x;
+            cameraTransform.m31 = camPos.y;
+            cameraTransform.m32 = camPos.z;
+
+            rt.SetViewMatrix(cameraTransform);
+
+            // Measure raytrace
             auto start = std::chrono::high_resolution_clock::now();
             rt.RaytraceThreaded();
             auto end = std::chrono::high_resolution_clock::now();
 
             std::chrono::duration<double> time = end - start;
             std::string strTime = "RT time: " + std::to_string(time.count()) + "s";
+            CreateImage(w, h, framebuffer);
+
             Logger::WriteMessage(strTime.data());
 		}
 	};

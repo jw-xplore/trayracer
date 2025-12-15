@@ -229,6 +229,7 @@ int main()
         std::chrono::duration<double> ms_double = frameEnd - frameStart;
         double frameTime = ms_double.count();
         std::cout << "FPS: " << 1 / frameTime << std::endl;
+        //break;
     }
 
     if (wnd.IsOpen())
