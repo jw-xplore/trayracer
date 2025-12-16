@@ -43,7 +43,7 @@ public:
 
     bool IsNormalized()
     {
-        return len(*this) == 0;
+        return len(*this) == 1;
     }
 
     bool IsZero()
